@@ -1,10 +1,8 @@
 # poosdSmallProject
 
-Note: The most updated branch developed on was the Styling branch
+URL: http://poosdgroup4.xyz/
 
-## Installing PuTTY
-Install the latest version (8.0) at this link
-https://www.chiark.greenend.org.uk/%7Esgtatham/putty/latest.html
+Note: The most updated branch developed on was the Styling branch
 
 ## Putty connection info
 Connect with SSH <br>
