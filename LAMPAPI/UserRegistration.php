@@ -15,9 +15,11 @@
     if ($conn->connect_error) {
         returnWithError("Connection failed: " . $conn->connect_error);
     } else {
+
         // Check if login already exists
         $stmt = $conn->prepare("SELECT Login FROM Users WHERE Login=?");
         $stmt->bind_param("s", $login);
+
         $stmt->execute();
         $result = $stmt->get_result();
 
