@@ -1,33 +1,54 @@
 <?php
     // User Registration Script
     $inData = getRequestInfo();
+
+    $login = $inData["login"];
+    // Hash the password before storing it
+    $password = $inData["password"];
+    $firstName = $inData["firstName"];
+    $lastName = $inData["lastName"];
+
     // Create database connection
-    $conn = new mysqli("localhost", "TheBeast", "WeLoveCOP4331", "COP4331"); 	
+    $conn = new mysqli("localhost", "TheBeast", "WeLoveCOP4331", "COP4331");
+
     // Check connection
     if ($conn->connect_error) {
-        die("Connection failed: " . $conn->connect_error);
-    }
-    // Validate input
-    if ($result->num_rows > 0) {
-        echo "Username already exists. Please choose a different one.";
+        returnWithError("Connection failed: " . $conn->connect_error);
     } else {
-        // Hash the password
-        // Insert new user into the database
-        $stmt = $conn->prepare("INSERT INTO Users (firstName, lastName,Login, Password) VALUES (?, ?)");
-        $stmt->bind_param("ss",$inData["firstName"], $inData["lastName"], $inData["login"], $inData["password"]);
-        $stmt->execute();
 
-        if ($stmt->affected_rows > 0) {
-            echo "Registration successful!";
+        // Check if login already exists
+        $stmt = $conn->prepare("SELECT Login FROM Users WHERE Login=?");
+        $stmt->bind_param("s", $login);
+
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        if ($result->num_rows > 0) {
+            // Login already exists
+            returnWithError("Login already in use");
         } else {
-            echo "Error: " . $stmt->error;
+            // Login is unique, proceed with insertion
+            $stmt = $conn->prepare("INSERT INTO Users (Login, Password, firstName, lastName) VALUES (?, ?, ?, ?)");
+            $stmt->bind_param("ssss", $login, $password, $firstName, $lastName);
+            $stmt->execute();
+            returnWithError(""); // No error, registration successful
         }
+
         $stmt->close();
+        $conn->close();
     }
-    $checkUser->close();
-    $conn->close();
-    function getRequestInfo()
-	{
-		return json_decode(file_get_contents('php://input'), true);
-	}
+
+    function getRequestInfo() {
+        return json_decode(file_get_contents('php://input'), true);
+    }
+
+    function sendResultInfoAsJson($obj) {
+        header('Content-type: application/json');
+        echo $obj;
+    }
+
+    function returnWithError($err) {
+        $retValue = '{"error":"' . $err . '"}';
+        sendResultInfoAsJson($retValue);
+    }
 ?>
